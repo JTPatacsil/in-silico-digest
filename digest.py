@@ -5,7 +5,6 @@
     #https://web.expasy.org/peptide_mass/
 
 import sys
-import custom_io as io
 from Seq import *
 from Enzyme import *
 from Fragment import *
@@ -15,6 +14,7 @@ from Fragment import *
 #   the minimum and maximum fragment lengths
 #   the min and max fragment weight
 #   the number of missed cleavages
+
 
 def get_missed_cleavages(Seq, num_missed):
     frags = Seq.fragments
@@ -34,6 +34,7 @@ def get_missed_cleavages(Seq, num_missed):
             for j in range(1,num_missed + 1):
                 f = f + frags[i+j]
         
+        # fragment name is the number of missed cleavages it has
         f.name = str(num_missed)
         res.append(f)
         
@@ -45,12 +46,10 @@ def digest(Seq, Enzyme, min_l, max_l, min_w, max_w, missed_cleavages):
     
     Enzyme.cleave(Seq)
     
-    # Psuedocode
-    # loop through 0:missed_cleavages
-    #   generate missed cleavages fragments
-    #   check fragments to see if they are valid
-    
     # generate all possible fragments
+    # we do this because we do not know which fragments are going to be generated
+    # so generate all and hten filter for valid
+    
     all_frags = []
     for i in range(0,missed_cleavages+1):
         mc = get_missed_cleavages(Seq,i)

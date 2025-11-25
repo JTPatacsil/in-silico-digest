@@ -23,6 +23,17 @@ import gzip
 import urllib.request
 from urllib.error import HTTPError
 
+def get_seq(cont):
+    # access uniprot
+    # shouldn't be a dot in the name
+    if cont.find(".") == -1:
+        s = access_uniprot(cont)        
+    else:
+        s = read_file(cont)
+        
+    return s
+
+
 
 def access_uniprot(uni_protID):
     # url = "https://rest.uniprot.org/uniprotkb/P12345?format=xml"

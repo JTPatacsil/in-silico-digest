@@ -1,2 +1,6 @@
 # ignore the pycache file
-__pycache__
+__pycache__/
+*.pyc
+
+#ignore local data directory
+data/
