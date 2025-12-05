@@ -1,6 +1,7 @@
 # Sequence fragment that would be generated from an enzymatic digest
 # Initialized based on a sequence, and the aa around a splice site
 #   Will calculate the length and weight of a fragment
+
 class Fragment:
     def __init__(self, seq, prev_aa, next_aa, pos = 0, name = "0"):
         self.seq = str(seq)
@@ -24,10 +25,11 @@ class Fragment:
     def __len__(self):
         return len(self.seq)
     
+    
     # calculates the molecular weight of a sequence
     # If an unknown amino acid is given, the function will provide the 
     # average weight of an amino acid, 110.0 Da. 
-    
+    # https://www.researchgate.net/figure/Molecular-Formula-Molecular-Mass-N-Content-and-Calculated-CP-of-20-Amino-Acids-1_tbl1_331719969    
     def seq_weight(self):
         seq = self.seq
         
@@ -52,20 +54,20 @@ class Fragment:
             
         return w + 19 # takes into account the H2O and H at the ends of the chain
     
+    # another method to get the length of a fragment
     def seq_length(self):
         return len(self.seq)
     
     # POSITION. NOT INDEX
     def frag_position(self):
         start = self.pos + 1
-        end = self.pos + self.seq_length()
+        end = start + self.seq_length()
         
         return (start, end)
     
     # determines if a fragment is valid, based on the user's specification
     # DOES NOT check exception sites of enzymes
     # Only checks the fragment length and weight
-    
     def isValidFragment(self,min_l,max_l,min_w,max_w):            
         valid = False
         
@@ -89,6 +91,11 @@ class Fragment:
             valid = True
             
         return valid
+    
+    # exports the fragment information as a tsv. 
+    # will contain the name (number of missed cleavages), the seq and it's position
+    # and the attributes of the fragment
+    # method used in custom_io module to create a table of fragment
     
     def export_as_tsv(self):
         l = [self.name, self.seq, self.pos, self.seq_length(),round(self.seq_weight(),3),

@@ -17,7 +17,7 @@
 
 import xml.etree.ElementTree as ET
 import urllib
-import sys
+import sys, os
 import gzip
 
 import urllib.request
@@ -62,17 +62,21 @@ def access_uniprot(uni_protID):
 
 # Should be able to handle a fasta, gzip, zip file
 def read_file(f):
-    if f.endswith("gzip"):
+    # checking to make sure the file exists
+    if os.path.exists(f):
+        pass
+    else:
+        print("File not found")
+        sys.exit(1)
+
+    # handeling file types
+    if f.endswith("gzip") or f.endswith("gz"):
         f = gzip.open(f)
     else:
-        contents = read_seq_file(f)
-        
-    return contents
-    
+        f = open(f)
 
-def read_seq_file(f):
-    f = open(f)
-    
+
+    # Reading file
     name     = ""
     contents = []
     for line in f:
@@ -88,7 +92,7 @@ def read_seq_file(f):
         else:
             contents.append(line.strip())
         
-    return ["".join(contents),name]
+    return ["".join(contents),name]    
     
 
 def make_frag_table(fragment_list):

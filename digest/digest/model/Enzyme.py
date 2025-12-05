@@ -1,6 +1,6 @@
 import sys
-from Seq import *
-from Fragment import *
+from .Seq import *
+from .Fragment import *
 
 # Enzyme class - contains information relevant to protein digestion
 # Proteins are written N -> C
@@ -13,6 +13,8 @@ from Fragment import *
     # ex: after P
 # example:
 # trypsin = Enzyme("C", ["K","R"], [("K","P"),("R","P")])
+
+
 class Enzyme:
     def __init__(self, cleavage_terminus = "", cleavage_sites = [], exception_sites = [(None,None)]):
         
@@ -28,6 +30,7 @@ class Enzyme:
         
         # for use later, indexes of where the enzyme will cleave
         self.cleave_indexes = []
+
         
         
     # This will find the cleave indexes for a given sequence

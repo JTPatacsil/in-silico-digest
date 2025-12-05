@@ -1,0 +1,19 @@
+Metadata-Version: 2.4
+Name: digest
+Version: 0.1
+Home-page: 
+Author: 
+Author-email: 
+Requires-Dist: TurboGears2>=2.4.3
+Requires-Dist: Beaker>=1.8.0
+Requires-Dist: Kajiki>=0.6.3
+Requires-Dist: tw2.forms
+Requires-Dist: WebHelpers2
+Requires-Dist: Babel
+Provides-Extra: testing
+Requires-Dist: WebTest>=1.2.3; extra == "testing"
+Requires-Dist: nose; extra == "testing"
+Requires-Dist: coverage; extra == "testing"
+Requires-Dist: gearbox; extra == "testing"
+Dynamic: provides-extra
+Dynamic: requires-dist

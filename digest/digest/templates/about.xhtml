@@ -1,0 +1,39 @@
+<html py:extends="master.xhtml" py:strip="True">
+    <head py:block="head" py:strip="True">
+    </head>
+
+    <body py:block="body" py:strip="True">
+      <div>
+        <h1> Project information </h1>
+        <p> The goal of this web application is to  perform an enzymatic digest of a user-provided protein sequence. The user will interact with the program via a TurboGears web-interface and will be able to specify different parameters (specified below) for the digest. The output will be a table of peptides with their length, molecular weight, # of missed cleavages, and the amino-acids to left and right of each peptide in the protein sequence</p>
+        
+        <h3> Parameters</h3>
+        <ul>
+          <li> Protein sequence (UniProt id or text)</li> 
+          <li> Enzyme </li>
+          <ul> <li> Supported Enzymes are listed <a href = "http://127.0.0.1:8080/enzymes"> here </a> </li> </ul>
+          <li> min and max length of the fragment </li> 
+          <li> min and max weight of the fragment </li> 
+          <li> number of missed cleavages allowed (0-5) </li>  
+        </ul>
+        
+        <h3> Output </h3>
+        
+        A table of fragments, of valid length and weight, with the following information.
+        <ul>
+          <li> Number of missed cleavages </li>
+          <li> The fragment sequence </li>
+          <li> The length of the fragment </li>
+          <li> The weight of the fragment </li>
+          <li> The amino acid to the left and right of the splice site </li> 
+        </ul>
+      </div>
+
+     
+    <div>
+      <p> Code available on <a href = "https://github.com/JTPatacsil/in-silico-digest"> GitHub </a></p>
+    </div> 
+      
+    </body>
+</html>
+

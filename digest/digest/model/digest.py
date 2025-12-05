@@ -1,13 +1,11 @@
-# get the molecular weight dictionary of amino avids
-# https://www.researchgate.net/figure/Molecular-Formula-Molecular-Mass-N-Content-and-Calculated-CP-of-20-Amino-Acids-1_tbl1_331719969
 
 # Should look like:
     #https://web.expasy.org/peptide_mass/
 
 import sys
-from Seq import *
-from Enzyme import *
-from Fragment import *
+from .Seq import *
+from .Enzyme import *
+from .Fragment import *
     
 # digest should take into account
 #   sequence and the enzyme

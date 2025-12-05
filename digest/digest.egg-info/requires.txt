@@ -1,0 +1,12 @@
+TurboGears2>=2.4.3
+Beaker>=1.8.0
+Kajiki>=0.6.3
+tw2.forms
+WebHelpers2
+Babel
+
+[testing]
+WebTest>=1.2.3
+nose
+coverage
+gearbox
