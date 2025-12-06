@@ -39,7 +39,7 @@ def get_missed_cleavages(Seq, num_missed):
     return res
 
 
-def digest(Seq, Enzyme, min_l, max_l, min_w, max_w, missed_cleavages):
+def enzyme_digest(Seq, Enzyme, min_l, max_l, min_w, max_w, missed_cleavages):
     # Generates Fragments
     
     Enzyme.cleave(Seq)

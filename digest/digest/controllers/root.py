@@ -15,13 +15,17 @@ from digest.model.digest import *
 
 import tw2.forms as twf
 from tg import validate
-from formencode import validators, compound, schema
+from formencode import validators, compound, schema, Invalid
 
 # used to validate the search form. Make sure arguments are valid
 class SearchFormValidator(schema.Schema):
-    query = validators.PlainText()
+    query = compound.All(validators.PlainText(),
+                         validators.Regex("^[AaCcDdEeFfGgHhIiKkLlMmNnPpQqRrSsTtVvWwXxYy0-9 ]+$"),
+                         strip = True)
 
-    enzyme = validators.OneOf(["Tryspin", "Arg","Lys N"])
+    enzyme = validators.OneOf(["Tryspin", "Arg C", "Asp N",
+                               "Lys N", "Lys C",  "CNBr",
+                               "Protein Kinase K", "Pepsin (pH 1.3)", "Pepsin (pH > 2)"])
 
     min_l = validators.Int(min = 0)
     max_l = validators.Int(min = 0)
@@ -30,16 +34,23 @@ class SearchFormValidator(schema.Schema):
 
     misses = validators.Int(min = 0)
 
+    # This function was given by Claude
+    # used to make sure that the minimums are less than the maximums
+    def validate_python(self, value_dict, state):
+        if value_dict.get('min_l') and value_dict.get('max_l') and int(value_dict['min_l']) >= int(value_dict['max_l']):
+            raise Invalid('Minimum length must be less than maximum length', value_dict, state)
+        if value_dict.get('min_w') and value_dict.get('max_w') and int(value_dict['min_w']) >= int(value_dict['max_w']):
+            raise Invalid('Minimum weight must be less than maximum weight', value_dict, state)
+
 
 class SearchForm(twf.Form):
     class child(twf.TableLayout):
-        # args
-        query  = twf.TextArea(label = "Search Term",
-                              rows = 3, cols = 50)
-        # file   = twf.FileField(label = "Example File")
+        query  = twf.TextArea(label = "Search Term", rows = 3, cols = 50)
         enzyme = twf.SingleSelectField(lable = "Enzyme",
-                                       options = ["Arg C",
-                                                  "Lys N"],
+                                       options = ["Arg C", "Asp N",
+                                                  "Lys N", "Lys C",
+                                                  "CNBr", "Protein Kinase K",
+                                                  "Pepsin (pH 1.3)", "Pepsin (pH >2)"],
                                        prompt_text = "Trypsin")
         
         min_l = twf.TextField(label = "Min Fragment length")
@@ -63,7 +74,7 @@ class SearchForm(twf.Form):
 class RootController(BaseController):
     ### Navigating the websites
     @expose('digest.templates.index')
-    def index(self):
+    def index(self, **kwargs):
         """ Handle the front page """
         return dict(form = SearchForm # form for data
                     )
@@ -78,7 +89,7 @@ class RootController(BaseController):
         """Project Information Page"""
         return dict(page = 'about')
     
-    ### Adding search functionality
+    ### Adding digest functionality
     @expose("digest.templates.digest")
     @validate(SearchForm, error_handler = index)
     def digest(self, query, enzyme = None, min_l = None, max_l = None,
@@ -86,16 +97,32 @@ class RootController(BaseController):
 
         ### FORMATTING PARAMATERS
         # sequence
-        seq = Seq(UniProt_acc = "P12345")
+        if any(c in "0123456789" for c in query): #Checking to see if it has a UniProt ID
+            seq = Seq(UniProt_acc = query)
+        else:
+            seq = Seq(seq = query, name = "User Provided Protein")
         
         # setting enzyme to enzyme class
         if enzyme == None or enzyme == "Trypsin":
             enzyme = Trypsin()
-        ### add other implemented enzymes
         elif enzyme == "Arg C":
-            pass
+            enzyme = ArgC()
+        elif enzyme == "Asp N":
+            enzyme = AspN()
+        elif enzyme == "Lys N":
+            enzyme = Lys_n()
+        elif enzyme == "Lys C":
+            enzyme = Lys_c()
+        elif enzyme == "CNBr":
+            enzyme = CNBr()
+        elif enzyme == "Protein Kinase K":
+            enzyme = PtKinase_K()
+        elif enzyme == "Pepsin (pH 1.3)":
+            enzyme = Pepsin_1_3()
+        elif enzyme == "Pepsin (pH > 2)":
+            enzyme = Pepsin_gt2()
 
-        
+
         # Other paramaters
         if min_l == None:
             min_l = 0
@@ -109,7 +136,7 @@ class RootController(BaseController):
             misses = 0
 
         #### running the program
-        valid_fragments = digest(seq, enzyme, min_l, max_l, min_w, max_w, misses)
+        valid_fragments = enzyme_digest(seq, enzyme, min_l, max_l, min_w, max_w, misses)
 
         # returning results to the webpage
         return dict(seq=seq,
@@ -117,3 +144,5 @@ class RootController(BaseController):
                     v_frags = valid_fragments)
     
     
+
+
