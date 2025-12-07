@@ -142,7 +142,4 @@ class RootController(BaseController):
         return dict(seq=seq,
                     enzyme = enzyme,
                     v_frags = valid_fragments)
-    
-    
-
 
