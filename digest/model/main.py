@@ -48,7 +48,6 @@ except IndexError:
         
     # sys.exit(1)
 
-    # For testing
     enzyme = "Trypsin"
     seq_input = "P12345"
     min_l = 0

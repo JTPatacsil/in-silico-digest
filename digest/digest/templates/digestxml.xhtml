@@ -1,0 +1,24 @@
+<!DOCTYPE xml>
+<digest>
+  <input_params>
+  	<seq>${seq}</seq>
+  	<enzyme>${enzyme}</enzyme>
+  	<num_valid_fragments>${len(v_frags)}</num_valid_fragments>
+  	<min_l>${params[0]}</min_l>
+  	<max_l>${params[1]}</max_l>
+  	<min_w>${params[2]}</min_w>
+  	<max_w>${params[3]}</max_w>
+  	<missed_cleavages>${params[4]}</missed_cleavages>
+  </input_params>
+  <valid_fragments>
+  	<fragment py:for="f in v_frags">
+  		<seq>${f.seq}</seq>
+  		<mc>${f.name}</mc>
+  		<mass>${f.seq_weight()}</mass>
+  		<position>${f.pos}</position>
+  		<length>${f.seq_length()}</length>
+  		<left_aa>${f.surrounding_aa[0]}</left_aa>
+  		<right_aa>${f.surrounding_aa[1]}</right_aa>
+  	</fragment>
+  </valid_fragments>
+</digest>

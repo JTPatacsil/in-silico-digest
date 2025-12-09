@@ -3,21 +3,13 @@
         <title py:block="master_title">Digest: ${seq}</title>
     </head>
     <body py:block="body" py:strip="True">
-    <div> Valid fragments from digestion of ${seq.name} cover ${round(seq.fragment_coverage(),2)}% of the sequence</div>
-    <p> Parameters given:</p>
-    <ul> 
-    	<li> Enzyme: ${enzyme}</li>
-    	<li> Length range: ${params[0]} - ${params[1]}</li>
-    	<li> Weight (Da) range: ${params[2]} - ${params[3]}</li>
-    	<li> Allowed missed cleavages (MC): ${params[4]}</li>
-    </ul>
+    <div> Valid fragments from digestion of ${seq.name}</div>
     <p/>
         <table class = "table">
         	<!-- insert header row -->
         	<tr>
         		<th>MC</th>
         		<th>Mass (Da)</th>
-        		<th>Position</th>
         		<th>Length</th>
         		<th> Left AA </th>
         		<th> Right AA </th>
@@ -28,7 +20,6 @@
         	<tr py:for="f in v_frags">
         		<td> ${f.name} </td>
         		<td> ${round(f.seq_weight(),4)} </td>
-        		<td> ${f.pos}</td>
         		<td> ${f.seq_length()} </td>
         		<td> ${f.surrounding_aa[0]}</td>
         		<td> ${f.surrounding_aa[1]}</td>

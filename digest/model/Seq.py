@@ -64,19 +64,4 @@ class Seq:
             # adding to the indexes that have been covered.
             map(cov.add, ind)
 
-        return (1-(len(cov)/len(self.seq))) * 100
-
-    def sort_fragments(self,sort_method = "position"):
-        l = self.valid_fragments
-        if sort_method.lower() == "weight":
-            sl = sorted(l,key = lambda x: x.seq_weight(), reverse = True)
-            
-        elif sort_method.lower() == "position":
-            sl = sorted(l, key = lambda x: x.pos)
-
-        else:
-            print("Unknown sort method. Sorting by position in sequence")
-            sl = sorted(l, key = lambda x: x.pos)
-
-        self.valid_fragments = sl
-            
+        return len(cov)/len(self.seq) * 100

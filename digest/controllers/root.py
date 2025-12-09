@@ -13,34 +13,19 @@ __all__ = ['RootController']
 
 from digest.model.digest import *
 
-
 import tw2.forms as twf
 from tg import validate
 from formencode import validators, compound, schema, Invalid
 
 # used to validate the search form. Make sure arguments are valid
-all_enz = set()
-for e in all_enzymes:
-    n = e.name
-    all_enz.add(e.name)
-    
-    if n.find("(") >=0:
-        n = n.replace("(","")
-    if n.find(")") >=0:
-        n = n.replace(")", "")
-    if n.find(" ") >=0:
-        n = n.replace(" ", "_")
-
-    all_enz.add(n.lower())
-
-
 class SearchFormValidator(schema.Schema):
-    print(all_enz)
     query = compound.All(validators.PlainText(),
-                         validators.Regex("^[A-Za-z0-9]{6,}$"),
+                         validators.Regex("^[AaCcDdEeFfGgHhIiKkLlMmNnPpQqRrSsTtVvWwXxYy0-9 ]+$"),
                          strip = True)
 
-    enzyme = validators.OneOf(all_enz)
+    enzyme = validators.OneOf(["Tryspin", "Arg C", "Asp N",
+                               "Lys N", "Lys C",  "CNBr",
+                               "Protein Kinase K", "Pepsin (pH 1.3)", "Pepsin (pH > 2)"])
 
     min_l = validators.Int(min = 0)
     max_l = validators.Int(min = 0)
@@ -48,8 +33,6 @@ class SearchFormValidator(schema.Schema):
     max_w = validators.Int(min = 0)
 
     misses = validators.Int(min = 0)
-
-    sort_method   = validators.OneOf(["Position in sequence","Weight"])
 
     # This function was given by Claude
     # used to make sure that the minimums are less than the maximums
@@ -62,9 +45,12 @@ class SearchFormValidator(schema.Schema):
 
 class SearchForm(twf.Form):
     class child(twf.TableLayout):
-        query  = twf.TextArea(label = "Sequence", rows = 3, cols = 50)
+        query  = twf.TextArea(label = "Search Term", rows = 3, cols = 50)
         enzyme = twf.SingleSelectField(lable = "Enzyme",
-                                       options = [x.name for x in all_enzymes[1:]],
+                                       options = ["Arg C", "Asp N",
+                                                  "Lys N", "Lys C",
+                                                  "CNBr", "Protein Kinase K",
+                                                  "Pepsin (pH 1.3)", "Pepsin (pH >2)"],
                                        prompt_text = "Trypsin")
         
         min_l = twf.TextField(label = "Min Fragment length")
@@ -75,10 +61,6 @@ class SearchForm(twf.Form):
         misses = twf.SingleSelectField(label = "Number of missed cleavages allowed",
                                        options = ["1","2","3","4","5"],
                                        prompt_text = "0")
-
-        sort_method = twf.SingleSelectField(label = "Display results by",
-                                    options = ["Weight"],
-                                    prompt_text = "Position in sequence")
 
 
         # for presentation only...
@@ -100,9 +82,7 @@ class RootController(BaseController):
     @expose('digest.templates.enzymes')
     def enzymes(self):
         """Enzyme information page"""
-        enzyme_list = all_enzymes # list in the Enzymes module
-        return dict(page = 'enzymes',
-                    enzyme_list = enzyme_list)
+        return dict(page = 'enzymes')
 
     @expose('digest.templates.about')
     def about(self):
@@ -111,12 +91,9 @@ class RootController(BaseController):
     
     ### Adding digest functionality
     @expose("digest.templates.digest")
-    @expose("digest.templates.digestxml",
-            content_type = "text/xml")
-    
     @validate(SearchForm, error_handler = index)
     def digest(self, query, enzyme = None, min_l = None, max_l = None,
-               min_w = None, max_w = None, misses = None, sort_method = None):
+               min_w = None, max_w = None, misses = None):
 
         ### FORMATTING PARAMATERS
         # sequence
@@ -126,29 +103,27 @@ class RootController(BaseController):
             seq = Seq(seq = query, name = "User Provided Protein")
         
         # setting enzyme to enzyme class
-        if enzyme!= None:
-            enzyme = enzyme.lower()
-        
-        if enzyme == None or enzyme == "trypsin":
+        if enzyme == None or enzyme == "Trypsin":
             enzyme = Trypsin()
-        elif enzyme == "argc" or enzyme == "arg_c":
+        elif enzyme == "Arg C":
             enzyme = ArgC()
-        elif enzyme == "aspn" or enzyme == "asp_n":
+        elif enzyme == "Asp N":
             enzyme = AspN()
-        elif enzyme == "lysn" or enzyme == "lys_n":
+        elif enzyme == "Lys N":
             enzyme = Lys_n()
-        elif enzyme == "lysc" or enzyme == "lys_c":
+        elif enzyme == "Lys C":
             enzyme = Lys_c()
-        elif enzyme == "cnbr":
+        elif enzyme == "CNBr":
             enzyme = CNBr()
-        elif enzyme == "Protein Kinase K".lower() or enzyme == "protein_kinase_k":
+        elif enzyme == "Protein Kinase K":
             enzyme = PtKinase_K()
-        elif enzyme == "Pepsin (pH 1.3)".lower() or enzyme == "pepsin_ph_1_3":
+        elif enzyme == "Pepsin (pH 1.3)":
             enzyme = Pepsin_1_3()
-        elif enzyme == "Pepsin (pH > 2)".lower() or enzyme == "pepsin_ph_gt2":
+        elif enzyme == "Pepsin (pH > 2)":
             enzyme = Pepsin_gt2()
 
-        # Other paramaters. Setting defaults
+
+        # Other paramaters
         if min_l == None:
             min_l = 0
         if max_l == None:
@@ -160,19 +135,14 @@ class RootController(BaseController):
         if misses == None:
             misses = 0
 
-        if sort_method == None:
-            # print("storing default value")
-            sort_method = "Position"
-
         #### running the program
-        enzyme_digest(seq, enzyme, min_l, max_l, min_w, max_w, misses)
-        seq.sort_fragments(sort_method)
-        print("sort method:",sort_method)
+        valid_fragments = enzyme_digest(seq, enzyme, min_l, max_l, min_w, max_w, misses)
 
         # returning results to the webpage
         return dict(seq=seq,
                     enzyme = enzyme,
-                    v_frags = seq.valid_fragments,
-                    params = [min_l,max_l,min_w,max_w,misses])
+                    v_frags = valid_fragments)
     
     
+
+

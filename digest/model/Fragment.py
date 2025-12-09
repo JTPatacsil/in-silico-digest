@@ -19,7 +19,7 @@ class Fragment:
     # specifies how to add two fragments together
     def __add__(self,other):
         n_seq = self.seq + other.seq
-        return Fragment(n_seq, other.surrounding_aa[0], other.surrounding_aa[1],
+        return Fragment(n_seq, self.surrounding_aa[0], other.surrounding_aa[1],
                         pos = self.pos)
     
     def __len__(self):

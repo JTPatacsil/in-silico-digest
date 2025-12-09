@@ -31,29 +31,7 @@ class Enzyme:
         # for use later, indexes of where the enzyme will cleave
         self.cleave_indexes = []
 
-        # for representation:
-        self.name = "Base Enzyme Class"
-
-    def __str__(self):
-        return self.name
-
-    def disp_clv_sites(self):
-        return ", ".join(self.cleave_sites)
-
-    def disp_exc_sites(self):
-        if self.cleave_terminus == "N":
-            e_sites = [x[0] for x in self.exception_sites]
-
-        elif self.cleave_terminus == "C":
-            e_sites = [x[1] for x in self.exception_sites]
-
-        e_sites = set(e_sites)
-        e_sites = list(e_sites)
-        if e_sites[0] == None:
-            return "None"
-        else:
-            return "If " + ", ".join(e_sites) + " is " + self.cleave_terminus + "-term of cleave site"
-
+        
         
     # This will find the cleave indexes for a given sequence
     # The cleave indexes are adjusted for whether the enzyme cleaves at the N or the C terminus
@@ -137,26 +115,22 @@ class Trypsin(Enzyme):
             cleavage_sites=["K", "R"],
             exception_sites= [("K","P"),("R","P")]
         )
-        self.name = "Trypsin"
-
 
 class Lys_c(Enzyme):
     def __init__(self):
         super().__init__(
             cleavage_terminus="C",
-            cleavage_sites = ["K"]
+            cleavage_sites = ["K"],
+            exception_sites= [("K","P"),("R","P")]
         )
-        self.name = "Lys C"
-
 
 class Lys_n(Enzyme):
     def __init__(self):
         super().__init__(
             cleavage_terminus="N",
-            cleavage_sites = ["K"]
+            cleavage_sites = ["K"],
+            exception_sites= [("K","P"),("R","P")]
         )
-        self.name = "Lys N"
-
 
 class CNBr(Enzyme):
     def __init__(self):
@@ -164,8 +138,6 @@ class CNBr(Enzyme):
             cleavage_terminus= "C",
             cleavage_sites = ["M"]
         )
-        self.name = "CNBr"
-
 
 class AspN(Enzyme):
     def __init__(self):
@@ -173,24 +145,21 @@ class AspN(Enzyme):
             cleavage_terminus= "N",
             cleavage_sites= ["D"]
             )
-        self.name = "Asp N"
 
 class ArgC(Enzyme):
     def __init__(self):
         super().__init__(
             cleavage_terminus = "C",
-            cleavage_sites = ["R"],
+            cleavage_site = ["R"],
             exception_sites = [("R","P")]
             )
-        self.name = "Arg C"
 
 class Pepsin_1_3(Enzyme):
     def __init__(self):
         super().__init__(
             cleavage_terminus= "C",
-            cleavage_sites = ["F","L"]
+            cleavage_site = ["F","L"]
             )
-        self.name = "Pepsin (pH = 1.3)"
 
 class Pepsin_gt2(Enzyme):
     def __init__(self):
@@ -198,7 +167,6 @@ class Pepsin_gt2(Enzyme):
             cleavage_terminus = "C",
             cleavage_sites = ["F","L","W","Y","A","E","Q"]
             )
-        self.name = "Pepsin (pH > 2)"
 
 class PtKinase_K(Enzyme):
     def __init__(self):
@@ -206,24 +174,3 @@ class PtKinase_K(Enzyme):
             cleavage_terminus = "C",
             cleavage_sites = ["A","F","Y","W","I","L"]
             )
-        self.name = "Protein Kinase K"
-
-class Thermolysin(Enzyme):
-    def __init__(self):
-        super().__init__(
-            cleavage_terminus = "N",
-            cleavage_sites = ['A','F','I','L','M','V'],
-            exception_sites = []
-            )
-
-        e_sites = ["D","E"]
-        for x in e_sites:
-            for y in self.cleave_sites:
-                self.exception_sites.append((x,y))
-        self.name = "Thermolysin"
-
-
-
-all_enzymes = [Trypsin(),ArgC(),AspN(),Lys_n(),Lys_c(),CNBr(),
-               PtKinase_K(),Pepsin_1_3(),Pepsin_gt2(), Thermolysin()]
-

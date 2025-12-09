@@ -102,4 +102,4 @@ def make_frag_table(fragment_list):
     print(header)
     for f in fragment_list:
         print(f.export_as_tsv())
-    
+
