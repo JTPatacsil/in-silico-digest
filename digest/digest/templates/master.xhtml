@@ -26,14 +26,13 @@ Base template for all html pages
         <span class="icon-bar"></span>
       </button>
       <a class="navbar-brand" href="${tg.url('/')}">
-        <img src="${tg.url('/img/turbogears_logo.png')}" height="20" alt="TurboGears 2"/>
-        ${getattr(tmpl_context, 'project_name', 'turbogears2')}
+        <!--<img src="${tg.url('/img/turbogears_logo.png')}" height="20" alt="TurboGears 2"/>-->
+        ${getattr(tmpl_context, 'project_name', 'Home')}
       </a>
     </div>
 
     <div class="collapse navbar-collapse" id="navbar-content">
       <ul class="nav navbar-nav">
-        <li class="${('', 'active')[self.defined('page') and page=='digest']}"><a href="${tg.url('/')}">Home</a></li>
         <li class="${('', 'active')[self.defined('page') and page=='about']}"><a href="${tg.url('/about')}">About</a></li>
         <li class="${('', 'active')[self.defined('page') and page=='enzymes']}"><a href="${tg.url('/enzymes')}">Supported Enzymes</a></li>
       </ul>

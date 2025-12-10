@@ -7,17 +7,25 @@
         <h1> Project information </h1>
         <p> The goal of this web application is to  perform an enzymatic digest of a user-provided protein sequence. The user will interact with the program via a TurboGears web-interface and will be able to specify different parameters (specified below) for the digest. The output will be a table of peptides with their length, molecular weight, # of missed cleavages, and the amino-acids to left and right of each peptide in the protein sequence</p>
         
-        <h3> Parameters</h3>
+        <h3> Parameter information</h3>
         <ul>
           <li> Protein sequence (UniProt id or text)</li> 
-          <ul> <li> Can not contain spaces in the middle of the sequence </li></ul>
+          <ul> 
+          	<li>Can not contain spaces in the middle of the sequence</li>
+          	<li>Input needs to at least 6 characters long</li>
+          	<li>For accessing UniProt, this program will only consider the main protein sequence and cannot access variants or isoforms. </li>
+          </ul>
           <li> Enzyme </li>
           <ul> <li> Supported Enzymes are listed <a href = "http://127.0.0.1:8080/enzymes"> here </a> </li> </ul>
           <li> min and max length of the fragment </li> 
           <li> min and max weight of the fragment </li> 
+          <ul><li>This program uses the molecular weight of an amino acid. Does not consider charge. </li>
+          <li>Modifications to methionine (such as oxidation) or cysteines (such as reductions) are not considered.</li>
+          <li>PTMs are not considered in mass calculation</li>
+          <li>18 Da is added to all fragments to account for rehydration of the fragments after protein cleaving.</li>
+          </ul>
           <li> number of missed cleavages allowed (0-5) </li>  
-        </ul>
-        
+        </ul> 
         <h3> Output </h3>
         
         A table of fragments, of valid length and weight, with the following information.
@@ -28,6 +36,24 @@
           <li> The weight of the fragment </li>
           <li> The amino acid to the left and right of the splice site </li> 
         </ul>
+        
+        <h3> Programmatic Access</h3>
+        <p> You can access the program with the following urls, depending on what output you would like. Paramaters should be joined together with the <b>&amp;</b> symbol.</p>
+        <ul> 
+        <li> Normal: http://0.0.0.0:8080/digest?<b>Parameters</b></li>
+        <li> XML: http://0.0.0.0:8080/digest.xml?<b>Parameters</b></li>
+        </ul>
+        <b> Parameters </b>
+        <ul>
+        <li><b>query</b> - Protein sequence or UniProtID to be digested</li>
+        <li><b>enzyme</b> - default - Trypsin</li>
+        <li><b>min_l</b> - default=0</li>
+        <li><b>max_l</b> - default = 10000</li>
+        <li><b>min_w</b> - default = 0</li>
+        <li><b>max_w</b> - default = 100000</li>
+        <li><b>misses</b> - default = 0</li>
+        </ul>
+        
       </div>    
     </body>
 </html>

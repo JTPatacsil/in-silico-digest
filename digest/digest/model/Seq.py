@@ -1,5 +1,5 @@
 import sys
-from . import custom_io as io
+from . import custom_io 
 from .Fragment import *
 
 # Contains information about the protein sequence of interest
@@ -28,13 +28,13 @@ class Seq:
         
     # Used to construct class basedd on a file sequence
     def read_file(self, file):
-        l = io.read_file(file)
+        l = custom_io.read_file(file)
         self.seq = l[0]
         self.name = l[1]
     
     # Used to construct class basedd on a file sequence
     def access_uniprot(self, acc):
-        up = io.access_uniprot(acc)
+        up = custom_io.access_uniprot(acc)
         self.seq = up[0]
         self.name = up[1]
         

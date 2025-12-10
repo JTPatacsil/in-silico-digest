@@ -42,7 +42,8 @@ def access_uniprot(uni_protID):
         xml = urllib.request.urlopen(url)
     except HTTPError:
         print("HTTP Error, bad accession number")
-        sys.exit(1)
+        raise Exception("Bad accession number")
+        # sys.exit(1)
 
     name = uni_protID
     
@@ -55,8 +56,10 @@ def access_uniprot(uni_protID):
             seq = seq.text
             
         else:
-            print("No sequence element found in UniProt file", file = sys.stderr)
-            sys.exit(1)
+            print("No sequence element found in UniProt file")
+            # sys.exit(1)
+            raise Exception("No sequence element found in UniProt file")
+            
     
     return [seq,name]
 
@@ -69,13 +72,7 @@ def read_file(f):
         print("File not found")
         sys.exit(1)
 
-    # handeling file types
-    if f.endswith("gzip") or f.endswith("gz"):
-        f = gzip.open(f)
-    else:
-        f = open(f)
-
-
+    f = open(f)
     # Reading file
     name     = ""
     contents = []
@@ -103,3 +100,4 @@ def make_frag_table(fragment_list):
     for f in fragment_list:
         print(f.export_as_tsv())
     
+

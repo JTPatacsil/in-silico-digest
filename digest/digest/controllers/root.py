@@ -13,7 +13,6 @@ __all__ = ['RootController']
 
 from digest.model.digest import *
 
-
 import tw2.forms as twf
 from tg import validate
 from formencode import validators, compound, schema, Invalid
@@ -35,10 +34,9 @@ for e in all_enzymes:
 
 
 class SearchFormValidator(schema.Schema):
-    print(all_enz)
     query = compound.All(validators.PlainText(),
-                         validators.Regex("^[A-Za-z0-9]{6,}$"),
-                         strip = True)
+                         validators.Regex(r'^[ \n]*[A-Za-z0-9\n]*[ \n]*$'),
+                         validators.String(min=6, strip = True))
 
     enzyme = validators.OneOf(all_enz)
 
@@ -63,6 +61,7 @@ class SearchFormValidator(schema.Schema):
 class SearchForm(twf.Form):
     class child(twf.TableLayout):
         query  = twf.TextArea(label = "Sequence", rows = 3, cols = 50)
+
         enzyme = twf.SingleSelectField(lable = "Enzyme",
                                        options = [x.name for x in all_enzymes[1:]],
                                        prompt_text = "Trypsin")
@@ -86,7 +85,7 @@ class SearchForm(twf.Form):
         attrs = {'style': 'width: 600px;'}
     
     action = '/digest'
-    submit = twf.SubmitButton(value="Search")
+    submit = twf.SubmitButton(value="Digest")
     validator = SearchFormValidator
 
 class RootController(BaseController):
@@ -123,6 +122,7 @@ class RootController(BaseController):
         if any(c in "0123456789" for c in query): #Checking to see if it has a UniProt ID
             seq = Seq(UniProt_acc = query)
         else:
+            print("Manual setting sequence")
             seq = Seq(seq = query, name = "User Provided Protein")
         
         # setting enzyme to enzyme class
@@ -131,22 +131,26 @@ class RootController(BaseController):
         
         if enzyme == None or enzyme == "trypsin":
             enzyme = Trypsin()
-        elif enzyme == "argc" or enzyme == "arg_c":
+        elif enzyme in ["argc","arg_c","arg c"]:
             enzyme = ArgC()
-        elif enzyme == "aspn" or enzyme == "asp_n":
+        elif enzyme in ["aspn", "asp_n", "asp n"]:
             enzyme = AspN()
-        elif enzyme == "lysn" or enzyme == "lys_n":
+        elif enzyme in ["lysn", "lys_n", "lys n"]:
             enzyme = Lys_n()
-        elif enzyme == "lysc" or enzyme == "lys_c":
+        elif enzyme in ["lysc", "lys_c", "lys c"]:
             enzyme = Lys_c()
         elif enzyme == "cnbr":
             enzyme = CNBr()
-        elif enzyme == "Protein Kinase K".lower() or enzyme == "protein_kinase_k":
-            enzyme = PtKinase_K()
+        elif enzyme == "Proteinase K".lower() or enzyme == "proteinase_k":
+            enzyme = Proteinase_K()
         elif enzyme == "Pepsin (pH 1.3)".lower() or enzyme == "pepsin_ph_1_3":
             enzyme = Pepsin_1_3()
         elif enzyme == "Pepsin (pH > 2)".lower() or enzyme == "pepsin_ph_gt2":
             enzyme = Pepsin_gt2()
+        elif enzyme == "Thermolysin".lower():
+            enzyme = Thermolysin()
+        else:
+            raise Exception("Invalid enzyme given, Please input a correct enyzme")
 
         # Other paramaters. Setting defaults
         if min_l == None:
@@ -174,5 +178,4 @@ class RootController(BaseController):
                     enzyme = enzyme,
                     v_frags = seq.valid_fragments,
                     params = [min_l,max_l,min_w,max_w,misses])
-    
     

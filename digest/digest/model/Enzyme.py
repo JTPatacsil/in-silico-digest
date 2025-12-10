@@ -70,7 +70,7 @@ class Enzyme:
             exc_sites = self.exception_sites
             exc_sites = [x[1] for x in exc_sites]
         
-        sites = [0]
+        sites = []
         
         
         for i,aa in enumerate(Seq.seq):
@@ -86,13 +86,14 @@ class Enzyme:
                 sites.append(i)
             
         if self.cleave_terminus == "C":
-            sites = [0] + [x+1 for x in sites[1:]]
-        
-        sites.append(len(Seq.seq)-1)
+            sites = [x+1 for x in sites]
+
+        # doing this so that the cleave_function can find all fragments
+        sites.append(0) # first aa
+        sites.append(len(Seq.seq)) # last aa
         
         # removes duplicates if present and arranges them from N -> C
         sites = sorted(list(set(sites)))
-        
         return sites
     
     
@@ -106,26 +107,31 @@ class Enzyme:
         # if none is found, expect [0,len(Seq.seq)]
         cleave_indexes = self.find_cleave_indexes(Seq)
         fragments = []
-        
+
+        # cleave_indexes start at 0 and then go to the last cleave site
         for i in range(0,len(cleave_indexes)-1):
-            first = cleave_indexes[i]; last = cleave_indexes[i+1]
+            first = cleave_indexes[i]
+            last = cleave_indexes[i+1]
+
             seq = Seq.seq[first:last]
-            
-            prev_aa = Seq.seq[last-2] # grabs the aa before the site
+
+            try: # if the aa is out of range
+                prev_aa = Seq.seq[last-1] # grabs the aa before the site
+            except:
+                prev_aa = None
             
             # grabs the aa after the site
             try:
                 next_aa = Seq.seq[last]
             except IndexError: # if at the end of the sequence
                 next_aa = None
+                prev_aa = None
                 
             frag = Fragment(seq, prev_aa, 
                             next_aa)
             
             frag.pos = cleave_indexes[i]
-            
             fragments.append(frag)
-            
         Seq.fragments = fragments
     
 ### Child classes of Enzyme
@@ -200,13 +206,13 @@ class Pepsin_gt2(Enzyme):
             )
         self.name = "Pepsin (pH > 2)"
 
-class PtKinase_K(Enzyme):
+class Proteinase_K(Enzyme):
     def __init__(self):
         super().__init__(
             cleavage_terminus = "C",
             cleavage_sites = ["A","F","Y","W","I","L"]
             )
-        self.name = "Protein Kinase K"
+        self.name = "Proteinase K"
 
 class Thermolysin(Enzyme):
     def __init__(self):
@@ -225,5 +231,5 @@ class Thermolysin(Enzyme):
 
 
 all_enzymes = [Trypsin(),ArgC(),AspN(),Lys_n(),Lys_c(),CNBr(),
-               PtKinase_K(),Pepsin_1_3(),Pepsin_gt2(), Thermolysin()]
+               Proteinase_K(),Pepsin_1_3(),Pepsin_gt2(), Thermolysin()]
 

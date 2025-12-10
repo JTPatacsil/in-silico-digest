@@ -60,8 +60,10 @@ class Seq:
         for f in self.valid_fragments:
             s = f.pos
             l = len(f)
-            ind = list(range(s, s+l))
+
             # adding to the indexes that have been covered.
-            map(cov.add, ind)
+            for ind in range(s,s+l):
+                cov.add(ind)
+
 
         return len(cov)/len(self.seq) * 100

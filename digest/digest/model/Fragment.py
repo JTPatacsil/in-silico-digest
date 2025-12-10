@@ -30,9 +30,17 @@ class Fragment:
     # If an unknown amino acid is given, the function will provide the 
     # average weight of an amino acid, 110.0 Da. 
     # https://www.researchgate.net/figure/Molecular-Formula-Molecular-Mass-N-Content-and-Calculated-CP-of-20-Amino-Acids-1_tbl1_331719969    
+    ##### peptide sequence LSH returns different results for me and PeptideMass
+    # issue is fixed now
+    # i get 409.41 (originally)
+    # Peptidemass gets 355.1856
+    # issue is likely the fact that the amino acids listed are fully hydrated
+    # need to remove the water for each addition of an amino acid
+
     def seq_weight(self):
         seq = self.seq
-        
+
+        # weight of fully hydrated amino acids
         d = {"A":89.09 , "R":174.20,"N":123.12,"D":133.10,
              "C":121.16, "E":147.13,"Q":146.14,"G":75.07,
              "H":155.15, "I":131.17,"L":131.17,"K":146.19,
@@ -40,8 +48,12 @@ class Fragment:
              "T":119.12, "W":204.23,"Y":181.19,"V":117.15
              }
         
-        w = 0
+        w = 0 
         for aa in seq:
+            # peptide chain grows by dehydration symnthesis:
+            if w != 0:
+                w = w - 18
+                
             try:
                 w = w + d[aa]
             except KeyError:
@@ -52,7 +64,7 @@ class Fragment:
                 w = w + 110.0
                 # pass
             
-        return w + 19 # takes into account the H2O and H at the ends of the chain
+        return w
     
     # another method to get the length of a fragment
     def seq_length(self):
